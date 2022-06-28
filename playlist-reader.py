@@ -1,36 +1,27 @@
-from types import prepare_class
-import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
-import config
-import tidal_backend
 import tidalapi
-import logging
-import json
-
-songs = []
-
-sp = spotipy.Spotify(
-    auth_manager=SpotifyClientCredentials(
-        client_id=config.spotify_key,
-        client_secret=config.spotify_secret
-    )
-)
-
-def playlist_songs(url):
-    songs = sp.playlist_items(
-        playlist_id=url, additional_types=('track',))['items']
-    print(songs)
-    return songs
-
+import tidal_backend
+import spotify_backend
 
 
 def main():
-    # songs = playlist_songs(
-    #     url="https://open.spotify.com/playlist/7ozIozDp260fjNOZy1yzRG?si=6c9576eb3d3e46dd"
-    # )
+    spotify = spotify_backend.SpotifyBackend()
+    spotify.create_session()
+    songs = spotify.playlist_songs("https://open.spotify.com/playlist/0nl9sjINtq6dIVnPZIGvDt?si=e036722c51464ec0")
 
     tidal = tidal_backend.TidalBackend()
     tidal.oauth_session()
+    songs_to_search = []
+    for song in songs:
+        songs_to_search.append(song['track']['name'] + " " + song['track']['artists'][0]['name'])
+        
+    songs_to_add = []
+    for song in songs_to_search:
+        songs_to_add.append(tidal.search_song(song))
+    
+    playlist = tidalapi.Playlist()
+    print(playlist)
+
+    
 
 
 

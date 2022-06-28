@@ -48,3 +48,5 @@ class TidalBackend:
                 json.dump(data, session_file)
                 session_file.close()
 
+    def search_song(self, song):
+        return self._session.search(field="track", value=song, limit=1).tracks[0]
